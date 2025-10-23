@@ -4,12 +4,11 @@ export default function TextDisplay({ text, userInput }) {
     return (
         <Box
             sx={{
-                p: 3,
+                p: 1,
                 mb: 2,
-                backgroundColor: "action.hover",
-                borderRadius: 2,
-                border: 2,
-                borderColor: "divider",
+                backgroundColor: "transparent",
+                borderRadius: 0,
+                border: 0,
                 minHeight: 120,
                 display: "flex",
                 alignItems: "center",

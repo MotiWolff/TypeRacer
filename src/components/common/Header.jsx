@@ -6,7 +6,7 @@ export default function Header() {
     const { toggleTheme, mode } = useThemeContext();
 
     return (
-        <AppBar position="static" elevation={0} sx={{ mb: 4 }}>
+        <AppBar position="static" color="transparent" elevation={0} sx={{ mb: 4, backgroundColor: 'transparent', color: 'text.primary' }}>
             <Toolbar>
                 <Keyboard sx={{ mr: 2, fontSize: 32 }} />
                 <Typography variant="h5" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>

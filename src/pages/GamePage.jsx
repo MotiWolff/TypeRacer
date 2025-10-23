@@ -63,14 +63,11 @@ export default function GamePage() {
 
             <Container maxWidth="md" sx={{ flex: 1, py: 4 }}>
                 <Paper
-                    elevation={8}
+                    elevation={0}
                     sx={{
                         p: 4,
-                        borderRadius: 3,
-                        background: (theme) =>
-                            theme.palette.mode === 'dark'
-                                ? 'linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%)'
-                                : 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+                        borderRadius: 0,
+                        backgroundColor: 'transparent',
                     }}
                 >
                     <Timer elapsedTime={elapsedTime} />

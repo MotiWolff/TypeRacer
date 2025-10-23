@@ -1,22 +1,41 @@
-import { TextField } from "@mui/material";
+import { useEffect, useRef } from "react";
+import { Box } from "@mui/material";
 
+// Invisible input that captures typing, so users don't see a text area
 export default function TypingInput({ value, onChange, disabled }) {
+    const ref = useRef(null);
+
+    useEffect(() => {
+        if (!disabled) {
+            ref.current?.focus();
+        }
+    }, [disabled]);
+
     return (
-        <TextField
-            fullWidth
-            variant="outlined"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Start typing..."
-            autoFocus
-            disabled={disabled}
-            sx={{
-                "& .MuiOutlinedInput-root": {
-                    fontFamily: "monospace",
-                    fontSize: "1.1rem",
-                },
-            }}
+        <Box
+            onClick={() => ref.current?.focus()}
+            sx={{ position: "relative", height: 0, overflow: "hidden" }}
         >
-        </TextField>
+            <input
+                ref={ref}
+                type="text"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                disabled={disabled}
+                autoFocus
+                autoComplete="off"
+                spellCheck={false}
+                aria-label="hidden typing input"
+                style={{
+                    position: "absolute",
+                    opacity: 0,
+                    pointerEvents: "none",
+                    width: 1,
+                    height: 1,
+                    left: -9999,
+                    top: 0,
+                }}
+            />
+        </Box>
     );
 }
