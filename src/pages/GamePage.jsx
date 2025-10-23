@@ -1,4 +1,3 @@
-import React from "react";
 import {
     Container,
     Paper,
@@ -17,6 +16,7 @@ import TextDisplay from "../components/common/TextDisplay.jsx";
 import TypingInput from "../components/game/TypingInput.jsx";
 import Timer from "../components/common/Timer.jsx";
 import Leaderboard from "../components/common/Leaderboard.jsx";
+import MistakeAlert from "../components/game/MistakeAlert.jsx";
 import { useThemeContext } from "../context/ThemeContext.jsx";
 
 export default function GamePage() {
@@ -78,6 +78,9 @@ export default function GamePage() {
                     onChange={handleChange}
                     disable={isFinished}
                 />
+
+                {/* Display error alert when user makes a typo */}
+                <MistakeAlert show={mistake} />
 
                 {/* Show restart button on mistake */}
                 {mistake && (
