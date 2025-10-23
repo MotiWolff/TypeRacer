@@ -1,7 +1,11 @@
-import React from 'react'
+import { Alert } from "@mui/material"
 
-export default function MistakeAlert() {
+export default function MistakeAlert({ show }) {
     return (
-        <div>MistakeAlert</div>
+        show && (
+            <Alert severity="error" sx={{ mt: 1 }}>
+                ⚠️ Typo detected! Please correct it before continuing.
+            </Alert>
+        )
     )
 }
