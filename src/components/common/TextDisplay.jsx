@@ -37,13 +37,13 @@ export default function TextDisplay({ text, userInput }) {
                             fontWeight = 600;
                         } else {
                             color = "error.main";
-                            backgroundColor = "error.light";
+                            backgroundColor = "#3b0000";
                             fontWeight = 600;
                         }
                     } else if (index === userInput.length) {
                         // Current character to type - highlight with cursor
-                        backgroundColor = "primary.main";
-                        color = "primary.contrastText";
+                        backgroundColor = "#222";
+                        color = "#e6e6e6";
                         fontWeight = 700;
                     }
 

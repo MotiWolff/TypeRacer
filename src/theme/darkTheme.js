@@ -1,10 +1,28 @@
 import { createTheme } from "@mui/material/styles";
 
-// Create and export a light MUI theme
+// High-contrast dark theme with pure black background and light text
 export const darkTheme = createTheme({
   palette: {
-    mode: "dark", // use light color scheme
-    primary: { main: "#90caf9" }, // Primary color brand
-    background: { default: "#121212", paper: "#1e1e1e" }, // Default colors
+    mode: "dark",
+    primary: { main: "#ffffff" },
+    secondary: { main: "#bfbfbf" },
+    text: { primary: "#e6e6e6", secondary: "#b3b3b3" },
+    background: { default: "#000000", paper: "#000000" },
+    divider: "#222",
+  },
+  typography: {
+    fontFamily: "'EB Garamond', Georgia, 'Times New Roman', serif",
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundColor: "#000000",
+          color: "#e6e6e6",
+          WebkitFontSmoothing: "antialiased",
+          MozOsxFontSmoothing: "grayscale",
+        },
+      },
+    },
   },
 });

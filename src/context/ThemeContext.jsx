@@ -6,7 +6,8 @@ import { darkTheme } from "../theme/darkTheme";
 const ThemeContext = createContext();
 
 export function ThemeContextProvider({ children }) {
-    const [mode, setMode] = useState("light");
+    // Default to dark to match the requested black background look
+    const [mode, setMode] = useState("dark");
     const theme = useMemo(
         () => (mode === "light" ? lightTheme : darkTheme),
         [mode]
