@@ -1,15 +1,12 @@
 import {
     Container,
     Paper,
-    Typography,
     Box,
     Button,
     Snackbar,
     Alert,
-    Divider,
-    IconButton,
 } from "@mui/material";
-import { DarkMode, LightMode } from "@mui/icons-material";
+import { Refresh } from "@mui/icons-material";
 import { texts } from "../data/texts";
 import { useTypeRacer } from "../hooks/useTypeRacer";
 import TextDisplay from "../components/common/TextDisplay.jsx";
@@ -17,13 +14,13 @@ import TypingInput from "../components/game/TypingInput.jsx";
 import Timer from "../components/common/Timer.jsx";
 import Leaderboard from "../components/common/Leaderboard.jsx";
 import MistakeAlert from "../components/game/MistakeAlert.jsx";
-import { useThemeContext } from "../context/ThemeContext.jsx";
+import Header from "../components/common/Header.jsx";
+import Footer from "../components/common/Footer.jsx";
 
 export default function GamePage() {
     // Select random text for typing challenge
     const randomText = texts[Math.floor(Math.random() * texts.length)];
     const { state, dispatch } = useTypeRacer(randomText);
-    const { toggleTheme, mode } = useThemeContext();
 
     const {
         text,
@@ -61,51 +58,65 @@ export default function GamePage() {
     };
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 6 }}>
-            <Paper elevation={6} sx={{ p: 4, borderRadius: 3 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h4">Type Racer</Typography>
-                    <IconButton onClick={toggleTheme} color="primary">
-                        {mode === "light" ? <DarkMode /> : <LightMode />}
-                    </IconButton>
-                </Box>
+        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+            <Header />
 
-                <Timer elapsedTime={elapsedTime} />
-                <Divider sx={{ my: 2 }} />
-                <TextDisplay text={text} userInput={userInput} />
-                <TypingInput
-                    value={userInput}
-                    onChange={handleChange}
-                    disable={isFinished}
-                />
+            <Container maxWidth="md" sx={{ flex: 1, py: 4 }}>
+                <Paper
+                    elevation={8}
+                    sx={{
+                        p: 4,
+                        borderRadius: 3,
+                        background: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? 'linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%)'
+                                : 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+                    }}
+                >
+                    <Timer elapsedTime={elapsedTime} />
 
-                {/* Display error alert when user makes a typo */}
-                <MistakeAlert show={mistake} />
+                    <TextDisplay text={text} userInput={userInput} />
 
-                {/* Show restart button on mistake */}
-                {mistake && (
-                    <Box textAlign="center" mt={2}>
-                        <Button
-                            onClick={() => dispatch({ type: "RESET" })}
-                            variant="contained"
-                        >
-                            Restart
-                        </Button>
-                    </Box>
-                )}
+                    <TypingInput
+                        value={userInput}
+                        onChange={handleChange}
+                        disabled={isFinished}
+                    />
 
-                <Leaderboard leaderboard={leaderboard} />
-            </Paper>
+                    {/* Display error alert when user makes a typo */}
+                    <MistakeAlert show={mistake} />
+
+                    {/* Show restart button on mistake or finish */}
+                    {(mistake || isFinished) && (
+                        <Box textAlign="center" mt={2}>
+                            <Button
+                                onClick={() => dispatch({ type: "RESET" })}
+                                variant="contained"
+                                size="large"
+                                startIcon={<Refresh />}
+                                sx={{ px: 4, py: 1.5, borderRadius: 2 }}
+                            >
+                                {isFinished ? "Play Again" : "Restart"}
+                            </Button>
+                        </Box>
+                    )}
+
+                    <Leaderboard leaderboard={leaderboard} />
+                </Paper>
+            </Container>
+
+            <Footer />
 
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={3000}
                 onClose={() => dispatch({ type: "SNACK_CLOSE" })}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
             >
-                <Alert severity={snackbar.severity} variant="filled">
+                <Alert severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
                     {snackbar.message}
                 </Alert>
             </Snackbar>
-        </Container>
+        </Box>
     );
 }
