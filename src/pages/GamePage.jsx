@@ -5,8 +5,14 @@ import {
     Button,
     Snackbar,
     Alert,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
 } from "@mui/material";
-import { Refresh } from "@mui/icons-material";
+import { Refresh, Pause, PlayArrow } from "@mui/icons-material";
+import { useState } from "react";
 import { texts } from "../data/texts";
 import { useTypeRacer } from "../hooks/useTypeRacer";
 import TextDisplay from "../components/common/TextDisplay.jsx";
@@ -18,42 +24,46 @@ import Header from "../components/common/Header.jsx";
 import Footer from "../components/common/Footer.jsx";
 
 export default function GamePage() {
-    // Select random text for typing challenge
     const randomText = texts[Math.floor(Math.random() * texts.length)];
     const { state, dispatch } = useTypeRacer(randomText);
+    const { text, userInput, elapsedTime, isRunning, isPaused, isFinished, mistake, leaderboard, snackbar } = state;
 
-    const {
-        text,
-        userInput,
-        elapsedTime,
-        isRunning,
-        isFinished,
-        mistake,
-        leaderboard,
-        snackbar,
-    } = state;
+    const [showNameDialog, setShowNameDialog] = useState(false);
+    const [playerName, setPlayerName] = useState("");
+    const [finalWpm, setFinalWpm] = useState(0);
 
     const handleChange = (value) => {
-        // Start timer on first keystroke
-        if (!isRunning && !isFinished && value.length > 0)
+        if (!isRunning && !isFinished && value.length > 0) {
             dispatch({ type: "START" });
+        }
 
-        // Validate input matches expected text
         if (!text.startsWith(value)) {
             dispatch({ type: "MISTAKE" });
             return;
         }
+
         dispatch({ type: "FIXED" });
         dispatch({ type: "UPDATE_INPUT", payload: value });
 
-        // Calculate WPM and finish game
         if (value === text) {
             const timeMinutes = (elapsedTime || 1) / 60000;
             const words = text.split(" ").length;
             const wpm = (words / timeMinutes).toFixed(2);
-            const name =
-                prompt(`🎉 You finished! ${wpm} WPM — enter your name:`) || "Anonymous";
-            dispatch({ type: "FINISH", payload: { name, wpm } });
+            setFinalWpm(wpm);
+            setShowNameDialog(true);
+        }
+    };
+
+    const handleNameSubmit = () => {
+        const name = playerName.trim() || "Anonymous";
+        dispatch({ type: "FINISH", payload: { name, wpm: finalWpm } });
+        setShowNameDialog(false);
+        setPlayerName("");
+    };
+
+    const togglePause = () => {
+        if (isRunning && !isFinished) {
+            dispatch({ type: isPaused ? "RESUME" : "PAUSE" });
         }
     };
 
@@ -77,13 +87,26 @@ export default function GamePage() {
                     <TypingInput
                         value={userInput}
                         onChange={handleChange}
-                        disabled={isFinished}
+                        disabled={isFinished || isPaused}
+                        onEnterPress={togglePause}
                     />
 
-                    {/* Display error alert when user makes a typo */}
+                    {isRunning && !isFinished && (
+                        <Box textAlign="center" mt={2}>
+                            <Button
+                                onClick={togglePause}
+                                variant="outlined"
+                                size="medium"
+                                startIcon={isPaused ? <PlayArrow /> : <Pause />}
+                                sx={{ px: 3, py: 1, borderRadius: 2 }}
+                            >
+                                {isPaused ? "Resume" : "Pause"}
+                            </Button>
+                        </Box>
+                    )}
+
                     <MistakeAlert show={mistake} />
 
-                    {/* Show restart button on mistake or finish */}
                     {(mistake || isFinished) && (
                         <Box textAlign="center" mt={2}>
                             <Button
@@ -114,6 +137,39 @@ export default function GamePage() {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
+
+            <Dialog
+                open={showNameDialog}
+                onClose={() => { }}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>Congratulations!</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ mb: 2, textAlign: "center", fontSize: "1.5rem", fontWeight: "bold", color: "success.main" }}>
+                        {finalWpm} WPM
+                    </Box>
+                    <TextField
+                        autoFocus
+                        fullWidth
+                        label="Enter your name"
+                        variant="outlined"
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                        onKeyPress={(e) => {
+                            if (e.key === "Enter") {
+                                handleNameSubmit();
+                            }
+                        }}
+                        placeholder="Anonymous"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleNameSubmit} variant="contained" color="primary">
+                        Save Score
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
