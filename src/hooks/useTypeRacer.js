@@ -8,6 +8,8 @@ const initialState = (text) => ({
   startTime: null,
   elapsedTime: 0,
   isRunning: false,
+  isPaused: false,
+  pausedTime: 0,
   isFinished: false,
   mistake: false,
   correctCount: 0,
@@ -52,7 +54,22 @@ function reducer(state, action) {
     }
     case "TICK":
       // Calculate elapsed time since start
-      return { ...state, elapsedTime: Date.now() - state.startTime };
+      return {
+        ...state,
+        elapsedTime: Date.now() - state.startTime - state.pausedTime,
+      };
+    case "PAUSE":
+      return { ...state, isPaused: true, pauseStartTime: Date.now() };
+    case "RESUME":
+      const pauseDuration = state.pauseStartTime
+        ? Date.now() - state.pauseStartTime
+        : 0;
+      return {
+        ...state,
+        isPaused: false,
+        pausedTime: state.pausedTime + pauseDuration,
+        pauseStartTime: null,
+      };
     case "MISTAKE":
       return { ...state, mistake: true };
     case "FIXED":
@@ -83,14 +100,14 @@ export function useTypeRacer(selectedText) {
   // Initialize state with the selected text
   const [state, dispatch] = useReducer(reducer, selectedText, initialState);
 
-  // Timer Logic - updates elapsed time every 100ms while running
+  // Timer Logic - updates elapsed time every 100ms while running and not paused
   useEffect(() => {
     let interval;
-    if (state.isRunning) {
+    if (state.isRunning && !state.isPaused) {
       interval = setInterval(() => dispatch({ type: "TICK" }), 100);
     }
     return () => clearInterval(interval);
-  }, [state.isRunning]);
+  }, [state.isRunning, state.isPaused]);
 
   return { state, dispatch };
 }
